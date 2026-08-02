@@ -5,7 +5,7 @@ Submission for prompt [2]: *Alert Triage Workflow — show how a security engine
 ## Contents
 
 - [`alert-triage-writeup.md`](./alert-triage-writeup.md) — problem statement, user persona, proposed features with prioritization, success metrics, and the bonus section on engineering phases/dependencies/risks.
-- [`wireframe/alert-triage-wireframe.html`](./wireframe/alert-triage-wireframe.html) — interactive 3-screen wireframe (alert queue → investigate → resolve), annotated. Open in a browser to click between screens.
+- [`alert-triage-wireframe.html`](./alert-triage-wireframe.html) — interactive 3-screen wireframe...
 - `figma-link.md` — link to the Figma file (add before submitting; see note below).
 
 ## Note on the Figma requirement
