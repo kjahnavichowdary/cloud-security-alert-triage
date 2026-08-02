@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Alert Triage Workflow — Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#10141B; --panel:#171D27; --panel-2:#1E2632; --line:#2B3444;
+    --text:#E7EAF0; --text-dim:#95A0B3; --text-faint:#5C6779;
+    --accent:#5B9BFF; --accent-dim:#2C4A73;
+    --crit:#F0555A; --crit-bg:#3A1E20; --high:#F3A73B; --high-bg:#3A2C14;
+    --med:#E8D24C; --med-bg:#35311A; --low:#7C8899; --low-bg:#232A34;
+    --note:#57C6A6; --note-bg:#123128;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#0B0E13; font-family:'IBM Plex Sans',sans-serif; color:var(--text); padding:32px 16px 80px;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1180px; margin:0 auto;}
+  .doc-title{font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); margin:0 0 4px;}
+  .doc-sub{font-size:22px; font-weight:600; margin:0 0 28px;}
+  .tabs{display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--line);}
+  .tab{padding:10px 18px; font-size:13px; color:var(--text-dim); cursor:pointer; border-bottom:2px solid transparent; user-select:none;}
+  .tab.active{color:var(--text); border-bottom-color:var(--accent);}
+  .screen{display:none;}
+  .screen.active{display:block;}
+  .frame{background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  .frame-head{display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--line); background:var(--panel-2);}
+  .frame-head .fname{font-size:12px; color:var(--text-faint); letter-spacing:.04em;}
+  .badge{font-size:11px; padding:2px 8px; border-radius:20px; font-weight:500;}
+  .b-crit{background:var(--crit-bg); color:var(--crit);}
+  .b-high{background:var(--high-bg); color:var(--high);}
+  .b-med{background:var(--med-bg); color:var(--med);}
+  .b-low{background:var(--low-bg); color:var(--low);}
+
+  /* --- Screen 1: Queue --- */
+  .queue-body{display:grid; grid-template-columns:190px 1fr; min-height:420px;}
+  .filters{border-right:1px solid var(--line); padding:16px; font-size:12px;}
+  .filters h4{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin:14px 0 8px;}
+  .filters h4:first-child{margin-top:0;}
+  .flt-row{display:flex; align-items:center; justify-content:space-between; padding:5px 0; color:var(--text-dim);}
+  .flt-row .n{color:var(--text-faint);}
+  .qtop{display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--line);}
+  .pills{display:flex; gap:8px;}
+  .pill{font-size:11px; padding:3px 10px; border-radius:20px; display:flex; gap:6px; align-items:center;}
+  .search{font-size:12px; color:var(--text-faint); border:1px solid var(--line); border-radius:6px; padding:6px 12px; width:220px;}
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; text-transform:uppercase; letter-spacing:.04em; padding:9px 14px; border-bottom:1px solid var(--line);}
+  td{padding:11px 14px; border-bottom:1px solid var(--line); color:var(--text-dim); vertical-align:middle;}
+  tr.hot{background:rgba(240,85,90,0.05);}
+  .rname{color:var(--text); font-weight:500;}
+  .rsub{font-size:11px; color:var(--text-faint); margin-top:2px;}
+  .chip{font-size:10.5px; color:var(--text-faint); border:1px solid var(--line); border-radius:4px; padding:1px 6px;}
+
+  /* --- Screen 2: Detail --- */
+  .det-body{display:grid; grid-template-columns:1fr 300px;}
+  .det-main{padding:20px; border-right:1px solid var(--line);}
+  .det-title{font-size:16px; font-weight:600; margin:0 0 2px;}
+  .det-sub{font-size:12px; color:var(--text-faint); margin-bottom:16px;}
+  .det-h{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin:18px 0 8px;}
+  .det-h:first-of-type{margin-top:0;}
+  .narrative{font-size:13px; line-height:1.6; color:var(--text-dim); background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:14px;}
+  .timeline{list-style:none; margin:0; padding:0; font-size:12.5px;}
+  .timeline li{display:flex; gap:12px; padding:8px 0; border-bottom:1px solid var(--line); color:var(--text-dim);}
+  .timeline .t{color:var(--text-faint); width:64px; flex-shrink:0;}
+  .evtabs{display:flex; gap:16px; border-bottom:1px solid var(--line); margin-top:6px; font-size:12px; color:var(--text-faint);}
+  .evtabs span{padding-bottom:8px;}
+  .evtabs span.on{color:var(--text); border-bottom:2px solid var(--accent);}
+  .evbox{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--text-dim); background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:12px; margin-top:10px; line-height:1.7;}
+  .minus{color:var(--crit);} .plus{color:var(--note);}
+  .side{padding:18px;}
+  .side-block{margin-bottom:20px;}
+  .side-block h5{font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); margin:0 0 10px;}
+  .kv{display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px solid var(--line); color:var(--text-dim);}
+  .kv b{color:var(--text); font-weight:500;}
+  .flag{display:inline-flex; align-items:center; gap:6px; font-size:11.5px; color:var(--crit); background:var(--crit-bg); border-radius:5px; padding:5px 8px; margin-top:6px;}
+  .actionbar{display:flex; gap:8px; padding:14px 20px; border-top:1px solid var(--line); background:var(--panel-2);}
+  .btn{font-size:12px; padding:8px 14px; border-radius:6px; border:1px solid var(--line); color:var(--text-dim); cursor:default;}
+  .btn-primary{background:var(--accent); border-color:var(--accent); color:#0B1B33; font-weight:500;}
+  .btn-danger{border-color:#5A2A2C; color:var(--crit);}
+
+  /* --- Screen 3: Resolve --- */
+  .res-body{padding:22px; display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .card{background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:16px;}
+  .card h5{font-size:12.5px; margin:0 0 10px; display:flex; align-items:center; gap:8px;}
+  .opt{display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); font-size:12px; color:var(--text-dim);}
+  .opt:last-child{border-bottom:none;}
+  .dot{width:14px; height:14px; border-radius:50%; border:1.5px solid var(--text-faint); flex-shrink:0; margin-top:1px;}
+  .dot.on{border-color:var(--accent); background:var(--accent);}
+  .taglabel{font-size:10px; color:var(--note); background:var(--note-bg); border-radius:4px; padding:1px 6px; margin-left:6px;}
+  .diffbox{font-family:'IBM Plex Mono',monospace; font-size:11px; background:#0D1117; border-radius:6px; padding:10px; margin-top:8px; line-height:1.7;}
+  .audit{font-size:11.5px; color:var(--text-faint); line-height:1.8;}
+  .full{grid-column:1 / -1;}
+
+  /* --- Annotations --- */
+  .marker{display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:var(--note); color:#08251D; font-size:10px; font-weight:600; margin-left:6px; flex-shrink:0;}
+  .notes{margin-top:18px; display:grid; gap:8px;}
+  .note-row{display:flex; gap:10px; font-size:12.5px; color:var(--text-dim); align-items:flex-start;}
+  .note-row .marker{margin-left:0; margin-top:1px;}
+  .note-row b{color:var(--text);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="doc-title">Design exercise · [2] Alert triage workflow</p>
+  <p class="doc-sub">How a security engineer investigates and resolves a cloud security alert</p>
+
+  <div class="tabs">
+    <div class="tab active" data-t="q">1 · Alert queue</div>
+    <div class="tab" data-t="d">2 · Investigate</div>
+    <div class="tab" data-t="r">3 · Resolve</div>
+  </div>
+
+  <!-- SCREEN 1 -->
+  <div class="screen active" id="q">
+    <div class="frame">
+      <div class="frame-head"><span class="fname">screen 1 / 3 — alert queue</span><span class="fname">Cloud Security Console</span></div>
+      <div class="qtop">
+        <div class="pills">
+          <span class="pill b-crit">● 4 critical</span>
+          <span class="pill b-high">● 11 high</span>
+          <span class="pill b-med">● 23 medium</span>
+        </div>
+        <div class="search">Search alerts, resources, accounts…</div>
+      </div>
+      <div class="queue-body">
+        <div class="filters">
+          <h4>Saved views</h4>
+          <div class="flt-row">My queue <span class="n">9</span></div>
+          <div class="flt-row">Unassigned <span class="n">14</span></div>
+          <div class="flt-row">Public-facing risk <span class="n">6</span></div>
+          <h4>Severity</h4>
+          <div class="flt-row">Critical <span class="n">4</span></div>
+          <div class="flt-row">High <span class="n">11</span></div>
+          <div class="flt-row">Medium <span class="n">23</span></div>
+          <h4>Cloud</h4>
+          <div class="flt-row">AWS <span class="n">27</span></div>
+          <div class="flt-row">Azure <span class="n">8</span></div>
+          <div class="flt-row">GCP <span class="n">3</span></div>
+          <h4>Status</h4>
+          <div class="flt-row">Open <span class="n">32</span></div>
+          <div class="flt-row">Snoozed <span class="n">6</span></div>
+        </div>
+        <div>
+          <table>
+            <thead><tr><th></th><th>Alert</th><th>Resource</th><th>Cloud</th><th>Age</th><th>Assigned</th></tr></thead>
+            <tbody>
+              <tr class="hot">
+                <td><span class="badge b-crit">Critical</span></td>
+                <td><div class="rname">S3 bucket publicly readable</div><div class="rsub">Public ACL grants read to all users</div></td>
+                <td class="mono">prod-user-uploads</td>
+                <td><span class="chip">AWS</span></td>
+                <td>14m</td>
+                <td>Unassigned</td>
+              </tr>
+              <tr class="hot">
+                <td><span class="badge b-crit">Critical</span></td>
+                <td><div class="rname">IAM role allows privilege escalation</div><div class="rsub">iam:PassRole + lambda:CreateFunction combo</div></td>
+                <td class="mono">deploy-automation-role</td>
+                <td><span class="chip">AWS</span></td>
+                <td>41m</td>
+                <td>Priya R.</td>
+              </tr>
+              <tr>
+                <td><span class="badge b-high">High</span></td>
+                <td><div class="rname">Security group open to 0.0.0.0/0 on port 22</div><div class="rsub">SSH exposed to internet</div></td>
+                <td class="mono">sg-bastion-legacy</td>
+                <td><span class="chip">AWS</span></td>
+                <td>2h</td>
+                <td>Unassigned</td>
+              </tr>
+              <tr>
+                <td><span class="badge b-high">High</span></td>
+                <td><div class="rname">Storage account allows anonymous access</div><div class="rsub">Blob container access level: Container</div></td>
+                <td class="mono">stgdiagnostics01</td>
+                <td><span class="chip">Azure</span></td>
+                <td>3h</td>
+                <td>Priya R.</td>
+              </tr>
+              <tr>
+                <td><span class="badge b-med">Medium</span></td>
+                <td><div class="rname">Unused IAM access key &gt; 90 days</div><div class="rsub">No API activity since creation</div></td>
+                <td class="mono">svc-legacy-etl</td>
+                <td><span class="chip">AWS</span></td>
+                <td>6d</td>
+                <td>Unassigned</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note-row"><span class="marker">1</span><span><b>Severity pills up top</b> — engineer sees the shape of today's queue before opening anything; sets triage order at a glance.</span></div>
+      <div class="note-row"><span class="marker">2</span><span><b>Saved views over ad-hoc filtering</b> — "public-facing risk" and "my queue" are the two lenses engineers actually re-use every shift.</span></div>
+      <div class="note-row"><span class="marker">3</span><span><b>Second line per row is plain-language context</b>, not just the rule ID — reduces the need to open the alert just to know what it means.</span></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2 -->
+  <div class="screen" id="d">
+    <div class="frame">
+      <div class="frame-head"><span class="fname">screen 2 / 3 — investigate</span><span class="badge b-crit">Critical</span></div>
+      <div class="det-body">
+        <div class="det-main">
+          <p class="det-title">S3 bucket publicly readable</p>
+          <p class="det-sub mono">prod-user-uploads · AWS · us-east-1 · detected 14m ago</p>
+
+          <div class="det-h">What happened</div>
+          <div class="narrative">Bucket ACL was changed to grant <b style="color:var(--text)">READ to AllUsers</b> at 09:41 UTC. The bucket holds objects tagged <b style="color:var(--text)">contains-pii</b>. No CloudTrail event for this change originated from a known CI/CD role.</div>
+
+          <div class="det-h">Timeline</div>
+          <ul class="timeline">
+            <li><span class="t mono">09:41</span> ACL changed to public-read by user <span class="mono" style="color:var(--text)">j.alvarez</span></li>
+            <li><span class="t mono">09:41</span> CSPM rule <span class="mono">s3-public-read</span> fired, alert created</li>
+            <li><span class="t mono">09:52</span> 3 anonymous GET requests observed in access logs</li>
+          </ul>
+
+          <div class="det-h">Evidence</div>
+          <div class="evtabs"><span class="on">Config diff</span><span>Access logs</span><span>Related alerts (2)</span></div>
+          <div class="evbox">
+<span class="minus">-  "AccessControlList": "private"</span><br>
+<span class="plus">+  "AccessControlList": "public-read"</span><br>
+<span class="minus">-  "GrantRead": [ "owner" ]</span><br>
+<span class="plus">+  "GrantRead": [ "owner", "AllUsers" ]</span>
+          </div>
+        </div>
+        <div class="side">
+          <div class="side-block">
+            <h5>Blast radius</h5>
+            <div class="kv">Internet-facing<b>Yes</b></div>
+            <div class="kv">Sensitive data<b>PII tag present</b></div>
+            <div class="kv">Objects exposed<b>~12,400</b></div>
+            <div class="kv">Roles with write access<b>4</b></div>
+            <div class="flag">⚠ Matches "public + PII" critical pattern</div>
+          </div>
+          <div class="side-block">
+            <h5>Suggested fix</h5>
+            <div class="narrative" style="font-size:12px;">Revert ACL to private. Generated patch available for one-click apply or export as Terraform diff.</div>
+          </div>
+        </div>
+      </div>
+      <div class="actionbar">
+        <div class="btn btn-primary">Remediate</div>
+        <div class="btn">Assign</div>
+        <div class="btn">Snooze with reason</div>
+        <div class="btn btn-danger">Escalate</div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note-row"><span class="marker">1</span><span><b>Blast radius panel is the whole point of this screen</b> — "is this public, and does it hold sensitive data" is the first question in any triage; surfacing it removes a trip to the IAM/console.</span></div>
+      <div class="note-row"><span class="marker">2</span><span><b>Config diff instead of a raw event dump</b> — shows exactly what changed and when, in a format engineers already read daily.</span></div>
+      <div class="note-row"><span class="marker">3</span><span><b>Action bar is sticky and always visible</b> — no scrolling back up after reading evidence to decide what to do.</span></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3 -->
+  <div class="screen" id="r">
+    <div class="frame">
+      <div class="frame-head"><span class="fname">screen 3 / 3 — resolve</span><span class="fname">S3 bucket publicly readable</span></div>
+      <div class="res-body">
+        <div class="card">
+          <h5>Remediation path</h5>
+          <div class="opt"><span class="dot on"></span><span>Apply suggested fix (revert ACL to private)<span class="taglabel">requires approval</span></span></div>
+          <div class="opt"><span class="dot"></span><span>Create ticket for owning team, pre-filled with context</span></div>
+          <div class="opt"><span class="dot"></span><span>Manual remediation checklist (3 steps)</span></div>
+          <div class="diffbox"><span class="plus">+ "AccessControlList": "private"</span><br><span class="plus">+ "GrantRead": [ "owner" ]</span></div>
+        </div>
+        <div class="card">
+          <h5>Close-out</h5>
+          <div class="kv">Reason<b>Confirmed true positive</b></div>
+          <div class="kv">Notify<b>#sec-alerts, j.alvarez</b></div>
+          <div class="kv">Resulting status<b>Resolved</b></div>
+          <div style="margin-top:10px;"><span class="btn btn-primary">Confirm & apply fix</span></div>
+        </div>
+        <div class="card full">
+          <h5>Audit log entry (preview)</h5>
+          <div class="audit mono">
+            10:03 UTC · priya.r · action: remediate · rule: s3-public-read · resource: prod-user-uploads · reason: "confirmed true positive, PII exposed 11 min" · patch applied: acl→private
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note-row"><span class="marker">1</span><span><b>Auto-fix defaults to "requires approval,"</b> not silent auto-apply — the tool proposes, a human confirms, given it's touching production cloud resources.</span></div>
+      <div class="note-row"><span class="marker">2</span><span><b>Ticket option pre-fills context</b> so the resource owner isn't re-typing what the engineer already investigated.</span></div>
+      <div class="note-row"><span class="marker">3</span><span><b>Every resolution writes an audit entry</b> with a required reason — this is what feeds compliance reporting and the false-positive metric later.</span></div>
+    </div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.t).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
